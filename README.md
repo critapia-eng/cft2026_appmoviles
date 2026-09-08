@@ -5,7 +5,7 @@ Backend= Victor
 
 Fronted= Benjamin Venegas
 
-devolopment = Cristobal Tapia
+devlopment = Cristobal Tapia
 
 
  --------------------------------------------------------
