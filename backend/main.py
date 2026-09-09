@@ -1,84 +1,98 @@
-import uuid
 import hashlib
-from datetime import datetime
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from typing import List
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+# 1. Importaciones corregidas arriba del todo
+from backend import models, schemas
+from backend.database import engine, get_db
+
+# Crear las tablas en la BD si no existen
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="API de Alertas de Salud - Telemetría")
 
-# Bases de datos temporales en memoria
-users_db = {}
-telemetry_db = []
-alerts_db = []
 
-# Modelos de datos
-class UserRegister(BaseModel):
-    name: str
-    rut: str
-    emergency_phone: str
+# --- ENDPOINTS ---
 
-class UserResponse(BaseModel):
-    user_id: uuid.UUID
-    name: str
-    rut_hashed: str
-    emergency_phone: str
+@app.post("/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+def registrar_usuario(user: schemas.UserRegister, db: Session = Depends(get_db)):
+    # 1. Cifrar el RUT con SHA-256 por privacidad
+    rut_hashed = hashlib.sha256(user.rut.strip().lower().encode()).hexdigest()
 
-class VitalSigns(BaseModel):
-    user_id: uuid.UUID
-    heart_rate: int = Field(..., ge=30, le=220)
-    systolic_pressure: int
-    diastolic_pressure: int
+    # Validar si el usuario ya existe
+    db_user = db.query(models.Usuario).filter(models.Usuario.rut_hashed == rut_hashed).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="El usuario con este RUT ya está registrado.")
 
-def hash_rut(rut: str) -> str:
-    clean_rut = rut.replace(".", "").replace("-", "").strip().lower()
-    return hashlib.sha256(clean_rut.encode()).hexdigest()
+    # 2. Asignar umbrales según la condición médica del paciente
+    condicion = user.condicion_medica.lower() if user.condicion_medica else "normal"
+    hr_min = 60
+    hr_max = 100
 
-@app.get("/")
-def home():
-    return {"status": "ok", "message": "Servidor backend activo"}
+    if condicion == "bradicardico":
+        hr_min = 45  # Tolera pulso en reposo más bajo sin disparar falsas alarmas
+    elif condicion == "taquicardico":
+        hr_max = 115 # Tolera pulso en reposo más alto sin disparar falsas alarmas
 
-@app.post("/users/register", response_model=UserResponse)
-def register_user(user: UserRegister):
-    user_id = uuid.uuid4()
-    rut_protected = hash_rut(user.rut)
-    
-    user_data = {
-        "user_id": user_id,
-        "name": user.name,
-        "rut_hashed": rut_protected,
-        "emergency_phone": user.emergency_phone
+    # 3. Guardar en BD
+    nuevo_usuario = models.Usuario(
+        nombre=user.nombre,
+        rut_hashed=rut_hashed,
+        telefono_emergencia=user.telefono_emergencia,
+        condicion_medica=condicion,
+        hr_min_custom=hr_min,
+        hr_max_custom=hr_max
+    )
+    db.add(nuevo_usuario)
+    db.commit()
+    db.refresh(nuevo_usuario)
+    return nuevo_usuario
+
+
+@app.post("/telemetry")
+def recibir_telemetria(data: schemas.VitalSigns, db: Session = Depends(get_db)):
+    # Buscar paciente por ID
+    usuario = db.query(models.Usuario).filter(models.Usuario.id == data.usuario_id).first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+
+    # Guardar lectura de telemetría
+    lectura = models.Telemetria(
+        usuario_id=data.usuario_id,
+        frecuencia_cardiaca=data.frecuencia_cardiaca,
+        presion_sistolica=data.presion_sistolica,
+        presion_diastolica=data.presion_diastolica
+    )
+    db.add(lectura)
+
+    # Lógica de detección de Alerta con Rango Personalizado
+    alerta_generada = None
+    if data.frecuencia_cardiaca > usuario.hr_max_custom:
+        alerta_generada = models.Alerta(
+            usuario_id=data.usuario_id,
+            tipo_alerta="TAQUICARDIA",
+            descripcion=f"Frecuencia de {data.frecuencia_cardiaca} BPM supera el máximo del paciente ({usuario.hr_max_custom} BPM)."
+        )
+    elif data.frecuencia_cardiaca < usuario.hr_min_custom:
+        alerta_generada = models.Alerta(
+            usuario_id=data.usuario_id,
+            tipo_alerta="BRADICARDIA",
+            descripcion=f"Frecuencia de {data.frecuencia_cardiaca} BPM está bajo el mínimo del paciente ({usuario.hr_min_custom} BPM)."
+        )
+
+    if alerta_generada:
+        db.add(alerta_generada)
+
+    db.commit()
+
+    return {
+        "status": "ok",
+        "mensaje": "Lectura registrada correctamente.",
+        "alerta": alerta_generada.tipo_alerta if alerta_generada else "Sin anomalías"
     }
-    users_db[user_id] = user_data
-    return user_data
 
-@app.post("/telemetry/send")
-def receive_telemetry(data: VitalSigns):
-    if data.user_id not in users_db:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    timestamp = datetime.now()
-    record = {**data.dict(), "timestamp": timestamp}
-    telemetry_db.append(record)
-
-    # Evaluación de rangos de peligro
-    is_high_pressure = data.systolic_pressure > 140
-    is_low_pressure = data.systolic_pressure < 90
-    is_anomalous_hr = data.heart_rate > 120 or data.heart_rate < 50
-
-    if is_high_pressure or is_low_pressure or is_anomalous_hr:
-        alert = {
-            "alert_id": uuid.uuid4(),
-            "user_id": data.user_id,
-            "timestamp": timestamp,
-            "reason": f"Sistólica: {data.systolic_pressure}, BPM: {data.heart_rate}",
-            "contact_phone": users_db[data.user_id]["emergency_phone"],
-            "status": "LLAMADA_A_HOSPITAL_INICIADA"
-        }
-        alerts_db.append(alert)
-        return {"alert_triggered": True, "message": "ANOMALÍA DETECTADA: Alerta enviada al hospital.", "alert_details": alert}
-
-    return {"alert_triggered": False, "message": "Signos vitales estables."}
-
-@app.get("/alerts")
-def get_alerts():
-    return {"alerts": alerts_db}
+@app.get("/alerts", response_model=List[schemas.AlertResponse])
+def listar_alertas(db: Session = Depends(get_db)):
+    return db.query(models.Alerta).all()
