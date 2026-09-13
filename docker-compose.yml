@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_app
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Goku2294
+      MYSQL_DATABASE: cft2026_appmoviles
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
