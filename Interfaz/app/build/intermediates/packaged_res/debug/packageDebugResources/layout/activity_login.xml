@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    android:fillViewport="true"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <!-- LOGO Y TÍTULO OFICIAL PULSEUP -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="❤️ PulseUP"
+            android:textColor="#1565C0"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="28dp"
+            android:text="Monitoreo Cardíaco - Adulto Mayor"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+        <!-- CAMPOS DE REGISTRO DEL PACIENTE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Nombre del Paciente"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="14dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="Ej: Juan Pérez"
+            android:inputType="textPersonName"
+            android:paddingHorizontal="12dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="RUT del Paciente"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etRut"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="14dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="Ej: 12.345.678-9"
+            android:inputType="text"
+            android:paddingHorizontal="12dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Teléfono de Emergencia (Familiar/Cuidador)"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="18dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="Ej: +56912345678"
+            android:inputType="phone"
+            android:paddingHorizontal="12dp"
+            android:textSize="15sp" />
+
+        <!-- PREGUNTA DE CONDICIÓN RÍTMICA -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccione su Condición Rítmica:"
+            android:textColor="#1565C0"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
+            android:text="Indique su ritmo cardíaco base diagnosticado por su médico:"
+            android:textColor="#777777"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spinnerCondition"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="26dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:paddingStart="8dp" />
+
+        <!-- BOTÓN DE INGRESO -->
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:backgroundTint="#1565C0"
+            android:text="Ingresar y Comenzar Monitoreo"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- MENSAJE DE ESTADO O ERROR -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textColor="#D32F2F"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+</ScrollView>

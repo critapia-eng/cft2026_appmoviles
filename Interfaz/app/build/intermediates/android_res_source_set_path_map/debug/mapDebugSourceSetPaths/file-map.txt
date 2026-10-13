@@ -1,0 +1,8 @@
+cl.cft2026.pulseup.app-pngs-0 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\build\generated\res\pngs\debug
+cl.cft2026.pulseup.app-updated_navigation_xml-1 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\build\generated\updated_navigation_xml\debug
+cl.cft2026.pulseup.app-packageDebugResources-2 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+cl.cft2026.pulseup.app-packageDebugResources-3 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+cl.cft2026.pulseup.app-debug-4 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\build\intermediates\merged_res\debug\mergeDebugResources
+cl.cft2026.pulseup.app-debug-5 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\src\debug\res
+cl.cft2026.pulseup.app-main-6 C:\Users\crist\OneDrive\Escritorio\cft2026_appmoviles\Interfaz\app\src\main\res
+gradleHome-0 C:\Users\crist\.gradle

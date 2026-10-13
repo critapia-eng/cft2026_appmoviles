@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "cl.cft2026.pulseup.app-mergeDebugResources-34:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\crist\\.gradle\\caches\\9.5.0\\transforms\\25b78fda36dc8f2df9a12ca70112ab79\\transformed\\appcompat-1.6.1\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}
