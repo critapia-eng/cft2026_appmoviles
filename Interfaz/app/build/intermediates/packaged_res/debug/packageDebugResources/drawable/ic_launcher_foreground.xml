@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Sombra suave del corazón -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M54,80 C54,80 26,63 26,43 C26,31 35,25 44,25 C49.5,25 52.8,28 54,30.5 C55.2,28 58.5,25 64,25 C73,25 82,31 82,43 C82,63 54,80 54,80 Z" />
+
+    <!-- Corazón Médico de PulseUP (Rojo carmesí degradado a coral) -->
+    <path android:pathData="M54,77 C54,77 27,61 27,41 C27,29.5 36,23.5 45,23.5 C50.5,23.5 53,26.5 54,28.8 C55,26.5 57.5,23.5 63,23.5 C72,23.5 81,29.5 81,41 C81,61 54,77 54,77 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:angle="90"
+                android:endColor="#FF1744"
+                android:startColor="#D50000"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Onda de Ritmo Cardíaco / Electrocardiograma en blanco radiante -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M23,51 L39,51 L43,43 L48,61 L55,33 L61,56 L65,51 L85,51"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Punto de pulso brillante -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M55,33m-2.2,0a2.2,2.2 0 1,0 4.4,0a2.2,2.2 0 1,0 -4.4,0" />
+</vector>
