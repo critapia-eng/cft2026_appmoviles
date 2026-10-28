@@ -1,7 +1,7 @@
 import requests
 import time
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:9000"
 
 def ejecutar_simulacion():
     print("=== INICIANDO SIMULACIÓN DE PRUEBAS ===")
@@ -10,10 +10,11 @@ def ejecutar_simulacion():
     res_user = requests.post(f"{BASE_URL}/users/register", json={
         "name": "Paciente Prueba", 
         "rut": "12.345.678-9", 
-        "emergency_phone": "+56912345678"
+        "emergency_phone": "+56912345678",
+        "condition_type": "Ritmo Normal (60 - 100 BPM)"
     })
     
-    if res_user.status_code != 200:
+    if res_user.status_code not in (200, 201):
         print("Error en registro:", res_user.text)
         return
 

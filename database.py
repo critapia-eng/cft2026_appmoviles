@@ -28,19 +28,58 @@ def init_db():
         conn = get_connection()
         cursor = conn.cursor()
         
-        # Sentencia SQL para la tabla 'usuarios' (almacena datos del adulto mayor)
+        # 1. Tabla usuarios (con campos user_id, nombre, rut_hashed, telefono_emergencia, condition_type)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id VARCHAR(36) UNIQUE,
             nombre VARCHAR(100) NOT NULL,
-            rut VARCHAR(12) UNIQUE,
-            telefono_emergencia VARCHAR(20)
+            rut_hashed VARCHAR(64),
+            telefono_emergencia VARCHAR(20),
+            condition_type VARCHAR(100) DEFAULT 'Ritmo Normal (60 - 100 BPM)'
         );
         """)
-        
+
+        # Asegurar columnas si la tabla ya existía previamente con esquema antiguo
+        cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'user_id'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE usuarios ADD COLUMN user_id VARCHAR(36) UNIQUE")
+
+        cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'rut_hashed'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE usuarios ADD COLUMN rut_hashed VARCHAR(64)")
+
+        cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'condition_type'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE usuarios ADD COLUMN condition_type VARCHAR(100) DEFAULT 'Ritmo Normal (60 - 100 BPM)'")
+
+        # 2. Tabla lecturas_ritmo
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS lecturas_ritmo (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id VARCHAR(36) NOT NULL,
+            heart_rate INT NOT NULL,
+            systolic_pressure INT NOT NULL,
+            diastolic_pressure INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 3. Tabla alertas_sos
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS alertas_sos (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id VARCHAR(36) NOT NULL,
+            reason VARCHAR(255) NOT NULL,
+            contact_phone VARCHAR(20) NOT NULL,
+            status VARCHAR(20) DEFAULT 'PENDIENTE',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
         # Confirma los cambios realizados en la base de datos
         conn.commit()
-        print("Base de datos conectada y tabla 'usuarios' verificada.")
+        print("Base de datos conectada y tablas verificadas/actualizadas correctamente.")
 
     except mysql.connector.Error as err:
         # Captura y muestra cualquier error relacionado con MySQL (conexión, permisos, etc.)

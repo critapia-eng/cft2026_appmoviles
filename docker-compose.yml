@@ -7,9 +7,23 @@ services:
       MYSQL_ROOT_PASSWORD: Goku2294
       MYSQL_DATABASE: cft2026_appmoviles
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    container_name: fastapi_app
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=Goku2294
+      - DB_NAME=cft2026_appmoviles
+    depends_on:
+      - db
 
 volumes:
   mysql_data:
