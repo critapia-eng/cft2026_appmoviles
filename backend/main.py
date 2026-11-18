@@ -7,6 +7,7 @@ if str(current_dir) not in sys.path:
     sys.path.insert(0, str(current_dir))
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Re-exportar datos y modelos para mantener 100% de retrocompatibilidad
@@ -41,6 +42,13 @@ app.include_router(alerts_router)
 @app.get("/")
 def home():
     return {"status": "ok", "message": "Servidor backend activo"}
+
+@app.get("/privacy", response_class=HTMLResponse)
+def get_privacy_policy():
+    privacy_file = Path(__file__).resolve().parent / "privacy.html"
+    if privacy_file.exists():
+        return HTMLResponse(content=privacy_file.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Política de Privacidad PulseUp - CFT Lota Arauco</h1><p>En proceso de actualización.</p>")
 
 if __name__ == "__main__":
     import uvicorn

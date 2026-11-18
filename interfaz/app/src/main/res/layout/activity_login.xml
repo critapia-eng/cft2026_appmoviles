@@ -269,5 +269,41 @@
             android:textColor="#D32F2F"
             android:textSize="13sp" />
 
+        <!-- Descargo de Responsabilidad Médica (Requisito Google Play Store) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#F9FBE7"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#DCE775"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚕️ Aviso Médico Preventivo"
+                    android:textColor="#827717"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="PulseUp es una aplicación de telemonitoreo preventivo y bienestar para adultos mayores. No constituye un dispositivo de diagnóstico clínico ni reemplaza el criterio o tratamiento médico profesional. Ante situaciones de urgencia vital, contacte de inmediato a los servicios de emergencia de su localidad."
+                    android:textColor="#33691E"
+                    android:textSize="10sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
 </ScrollView>
