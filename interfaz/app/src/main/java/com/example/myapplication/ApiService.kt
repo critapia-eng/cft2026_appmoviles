@@ -84,4 +84,7 @@ interface ApiService {
 
     @GET("telemetry/latest/{user_id}")
     fun getLatestTelemetry(@Path("user_id") userId: String): Call<LatestTelemetryResponse>
+
+    @GET("users/by-rut/{rut}")
+    fun getUserByRut(@Path("rut") rut: String): Call<UserRegisterResponse>
 }
