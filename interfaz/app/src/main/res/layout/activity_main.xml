@@ -41,7 +41,7 @@
                         android:id="@+id/tvWatchIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="⌚"
+                        android:text="⏱️"
                         android:textSize="22sp" />
 
                     <LinearLayout
@@ -61,8 +61,8 @@
                                 android:id="@+id/tvDeviceTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Smartwatch Vinculado (Modo Y13 / BLE)"
-                                android:textColor="#1565C0"
+                                android:text="Sin Smartwatch Vinculado"
+                                android:textColor="#757575"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
@@ -71,11 +71,11 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:background="#E8F5E9"
+                                android:background="#FFEBEE"
                                 android:paddingHorizontal="6dp"
                                 android:paddingVertical="2dp"
-                                android:text="● Conectado"
-                                android:textColor="#2E7D32"
+                                android:text="○ Desconectado"
+                                android:textColor="#C62828"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -94,11 +94,11 @@
                         android:id="@+id/tvDeviceBattery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#E8F5E9"
+                        android:background="#EEEEEE"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="3dp"
-                        android:text="🔋 94%"
-                        android:textColor="#2E7D32"
+                        android:text="🔋 --%"
+                        android:textColor="#757575"
                         android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -116,7 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:paddingHorizontal="6dp"
-                        android:text="🔗 Gestionar / Vincular Reloj"
+                        android:text="➕ Vincular Smartwatch"
                         android:textAllCaps="false"
                         android:textColor="#1565C0"
                         android:textSize="12sp"
@@ -128,7 +128,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:text="BLE: 78:4F:43:89:A1"
+                        android:text="BLE: Sin conexión"
                         android:textColor="#757575"
                         android:textSize="10sp" />
                 </LinearLayout>
