@@ -213,6 +213,41 @@
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Selector de Rol de Acceso (Paciente vs Familiar/Médico) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Tipo de Acceso / Rol"
+            android:textColor="#1565C0"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/rgUserRole"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rbPatient"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="👤 Soy el Paciente (Enlazar Smartwatch BLE)"
+                android:textColor="#212121"
+                android:textSize="13sp" />
+
+            <RadioButton
+                android:id="@+id/rbCaregiver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👨‍⚕️ Soy Familiar o Médico (Telemonitoreo Remoto)"
+                android:textColor="#212121"
+                android:textSize="13sp" />
+        </RadioGroup>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"

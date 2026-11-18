@@ -11,9 +11,32 @@ def register_user(user: UserRegister):
     user_id = str(uuid.uuid4())
     rut_protected = hash_rut(user.rut)
     
-    # 1. Guardar en Base de Datos MySQL con compatibilidad universal
+    # 1. Guardar o Recuperar en Base de Datos MySQL
     try:
         conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Verificar si el usuario ya existe por su RUT anonimizado
+        cursor.execute(
+            "SELECT user_id, nombre, rut_hashed, telefono_emergencia FROM usuarios WHERE rut_hashed = %s LIMIT 1",
+            (rut_protected,)
+        )
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            user_id = str(existing_user["user_id"])
+            cursor.close()
+            conn.close()
+            print(f"[MySQL Success] Usuario existente autenticado por RUT: {existing_user.get('nombre')} ({user_id})")
+            return {
+                "user_id": user_id,
+                "name": existing_user.get("nombre", user.name),
+                "rut_hashed": rut_protected,
+                "emergency_phone": existing_user.get("telefono_emergencia", user.emergency_phone),
+                "condition_type": user.condition_type or "Ritmo Normal"
+            }
+
+        cursor.close()
         cursor = conn.cursor()
 
         # Intento 1: Inserción directa en columnas estándar que existen sí o sí

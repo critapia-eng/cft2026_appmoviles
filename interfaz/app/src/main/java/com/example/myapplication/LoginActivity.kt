@@ -38,11 +38,24 @@ class LoginActivity : AppCompatActivity() {
             conditions
         )
 
+        val rgUserRole = findViewById<android.widget.RadioGroup>(R.id.rgUserRole)
+        val rbCaregiver = findViewById<android.widget.RadioButton>(R.id.rbCaregiver)
+
+        rgUserRole.setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == R.id.rbCaregiver) {
+                btnRegister.text = "Acceder como Cuidador / Médico"
+            } else {
+                btnRegister.text = getString(R.string.btn_start_monitoring)
+            }
+        }
+
         btnRegister.setOnClickListener {
             val name = etName.text.toString().trim()
             val rut = etRut.text.toString().trim()
             val phone = etPhone.text.toString().trim()
             val selectedCondition = spinnerCondition.selectedItem.toString()
+            val isCaregiver = rbCaregiver.isChecked
+            val userRole = if (isCaregiver) "FAMILIAR" else "PACIENTE"
 
             if (name.isEmpty() || rut.isEmpty() || phone.isEmpty()) {
                 Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
@@ -60,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
                 medical_history = if (medicalHistory.isNotEmpty()) medicalHistory else "Sin antecedentes reportados"
             )
 
-            tvStatus.text = "Registrando paciente..."
+            tvStatus.text = if (isCaregiver) "Verificando acceso de supervisor..." else "Registrando paciente..."
             btnRegister.isEnabled = false
 
             RetrofitClient.instance.registerUser(request).enqueue(object : Callback<UserRegisterResponse> {
@@ -71,18 +84,21 @@ class LoginActivity : AppCompatActivity() {
                     btnRegister.isEnabled = true
                     if (response.isSuccessful && response.body() != null) {
                         val userId = response.body()?.user_id ?: ""
-                        Toast.makeText(this@LoginActivity, "¡Registro Exitoso!", Toast.LENGTH_SHORT).show()
+                        val patientName = response.body()?.name ?: name
+                        val welcomeMsg = if (isCaregiver) "¡Acceso concedido a telemonitoreo!" else "¡Registro Exitoso!"
+                        Toast.makeText(this@LoginActivity, welcomeMsg, Toast.LENGTH_SHORT).show()
 
                         val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
                             putExtra("USER_ID", userId)
-                            putExtra("USER_NAME", name)
+                            putExtra("USER_NAME", patientName)
                             putExtra("USER_CONDITION", selectedCondition)
                             putExtra("EMERGENCY_PHONE", phone)
+                            putExtra("USER_ROLE", userRole)
                         }
                         startActivity(intent)
                         finish()
                     } else {
-                        tvStatus.text = "Error al registrar: Código ${response.code()}"
+                        tvStatus.text = "Error al autenticar: Código ${response.code()}"
                         Toast.makeText(
                             this@LoginActivity,
                             "Error en servidor (${response.code()})",

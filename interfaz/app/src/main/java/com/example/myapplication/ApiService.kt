@@ -43,10 +43,33 @@ data class AlertsHistoryResponse(
 )
 
 data class AlertItem(
-    val id: Int,
-    val heart_rate: Int,
-    val reason: String,
-    val timestamp: String
+    val id: Int? = null,
+    val alert_id: String? = null,
+    val heart_rate: Int? = null,
+    val reason: String? = null,
+    val contact_phone: String? = null,
+    val status: String? = null,
+    val timestamp: String? = null
+)
+
+data class LocationData(
+    val latitud: Double? = null,
+    val longitud: Double? = null,
+    val direccion_aproximada: String? = null
+)
+
+data class LatestTelemetryResponse(
+    val status: String,
+    val user_id: String,
+    val patient_name: String? = null,
+    val emergency_phone: String? = null,
+    val heart_rate: Int = 75,
+    val systolic_pressure: Int = 120,
+    val diastolic_pressure: Int = 80,
+    val timestamp: String? = null,
+    val is_alert: Boolean = false,
+    val latest_alert: AlertItem? = null,
+    val location: LocationData? = null
 )
 
 interface ApiService {
@@ -58,4 +81,7 @@ interface ApiService {
 
     @GET("alerts/{user_id}")
     fun getAlertsHistory(@Path("user_id") userId: String): Call<AlertsHistoryResponse>
+
+    @GET("telemetry/latest/{user_id}")
+    fun getLatestTelemetry(@Path("user_id") userId: String): Call<LatestTelemetryResponse>
 }

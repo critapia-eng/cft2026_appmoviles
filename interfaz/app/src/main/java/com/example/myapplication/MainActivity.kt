@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
     private var userName: String = ""
     private var userCondition: String = ""
     private var emergencyPhone: String = ""
+    private var userRole: String = "PACIENTE"
+    private var isCaregiver: Boolean = false
 
     // Estado del reloj inteligente vinculado (Bluetooth LE / PPG)
     private var isDeviceConnected = true
@@ -48,9 +50,19 @@ class MainActivity : AppCompatActivity() {
     private var isAutoMonitoring = false
     private val intervalMillis: Long = 5000
 
+    // Runnable para Modo Familiar / Médico (Telemonitoreo Remoto desde el Servidor)
+    private val caregiverTelemetryRunnable = object : Runnable {
+        override fun run() {
+            if (isAutoMonitoring && isCaregiver) {
+                consultarTelemetriaRemota()
+                handler.postDelayed(this, 3500)
+            }
+        }
+    }
+
     private val autoTelemetryRunnable = object : Runnable {
         override fun run() {
-            if (isAutoMonitoring) {
+            if (isAutoMonitoring && !isCaregiver) {
                 // Simulación realista según condición clínica del paciente:
                 // La gran mayoría del tiempo (aprox 90%) se mantiene en rango fisiológico estable.
                 // Con baja probabilidad (1 de cada 8 ciclos aprox) simula un evento de alerta SOS.
@@ -102,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         userName = intent.getStringExtra("USER_NAME") ?: "Paciente"
         userCondition = intent.getStringExtra("USER_CONDITION") ?: "Ritmo Normal"
         emergencyPhone = intent.getStringExtra("EMERGENCY_PHONE") ?: ""
+        userRole = intent.getStringExtra("USER_ROLE") ?: "PACIENTE"
+        isCaregiver = (userRole == "FAMILIAR")
 
         val tvWelcome = findViewById<TextView?>(R.id.tvWelcome)
         val tvHeartRateDisplay = findViewById<TextView?>(R.id.tvHeartRateDisplay)
@@ -116,10 +130,60 @@ class MainActivity : AppCompatActivity() {
         val tvMaxBpm = findViewById<TextView?>(R.id.tvMaxBpm)
         val btnCallFamily = findViewById<Button?>(R.id.btnCallFamily)
         val tvFamilyPhoneDisplay = findViewById<TextView?>(R.id.tvFamilyPhoneDisplay)
+        val cardSmartwatchStatus = findViewById<MaterialCardView?>(R.id.cardSmartwatchStatus)
+        val btnPairDevice = findViewById<Button?>(R.id.btnPairDevice)
 
-        tvWelcome?.text = "Paciente: $userName · $userCondition"
-        if (emergencyPhone.isNotEmpty()) {
-            tvFamilyPhoneDisplay?.text = "Contacto de Emergencia: $emergencyPhone"
+        if (isCaregiver) {
+            tvWelcome?.text = "👨‍⚕️ Cuidador · Monitoreando a: $userName"
+            if (emergencyPhone.isNotEmpty()) {
+                tvFamilyPhoneDisplay?.text = "Teléfono del Paciente: $emergencyPhone"
+            }
+
+            val tvDeviceTitle = findViewById<TextView?>(R.id.tvDeviceTitle)
+            val tvConnectionBadge = findViewById<TextView?>(R.id.tvConnectionBadge)
+            val tvDeviceBattery = findViewById<TextView?>(R.id.tvDeviceBattery)
+            val tvBleMac = findViewById<TextView?>(R.id.tvBleMac)
+            val tvWatchIcon = findViewById<TextView?>(R.id.tvWatchIcon)
+
+            tvDeviceTitle?.text = "Telemonitoreo Remoto en Vivo"
+            tvWatchIcon?.text = "👨‍⚕️"
+            tvConnectionBadge?.text = "● Nube Conectada"
+            tvConnectionBadge?.setBackgroundColor(Color.parseColor("#E8F5E9"))
+            tvConnectionBadge?.setTextColor(Color.parseColor("#2E7D32"))
+            tvDeviceBattery?.text = "☁️ Online"
+            tvBleMac?.text = "Canal: Servidor CFT Lota Arauco"
+            btnPairDevice?.text = "🔄 Actualizar Datos"
+
+            val listenerActualizar = View.OnClickListener {
+                consultarTelemetriaRemota()
+                Toast.makeText(this, "Actualizando telemetría del paciente...", Toast.LENGTH_SHORT).show()
+            }
+            btnPairDevice?.setOnClickListener(listenerActualizar)
+            cardSmartwatchStatus?.setOnClickListener(listenerActualizar)
+
+            // Ocultar sección de ingreso manual de telemetría para el familiar
+            findViewById<View?>(R.id.tilHeartRate)?.visibility = View.GONE
+            btnSendTelemetry?.visibility = View.GONE
+
+            btnStartAuto?.text = "▶ Iniciar Recepción"
+            btnStopAuto?.text = "⏹ Pausar"
+
+            // Iniciar recepción automática en vivo desde el servidor
+            isAutoMonitoring = true
+            handler.post(caregiverTelemetryRunnable)
+            tvStatus?.text = "Conectado al servidor. Recibiendo datos de $userName..."
+        } else {
+            tvWelcome?.text = "Paciente: $userName · $userCondition"
+            if (emergencyPhone.isNotEmpty()) {
+                tvFamilyPhoneDisplay?.text = "Contacto de Emergencia: $emergencyPhone"
+            }
+
+            val clickGestionReloj = View.OnClickListener {
+                mostrarDialogoGestionReloj()
+            }
+            cardSmartwatchStatus?.setOnClickListener(clickGestionReloj)
+            btnPairDevice?.setOnClickListener(clickGestionReloj)
+            actualizarEstadoVisualReloj()
         }
 
         // Configuración de rangos clínicos según condición
@@ -169,17 +233,16 @@ class MainActivity : AppCompatActivity() {
             enviarTelemetria(bpm, tvStatus, esAutomatico = false)
         }
 
-        val cardSmartwatchStatus = findViewById<MaterialCardView?>(R.id.cardSmartwatchStatus)
-        val btnPairDevice = findViewById<Button?>(R.id.btnPairDevice)
-
-        val clickGestionReloj = View.OnClickListener {
-            mostrarDialogoGestionReloj()
-        }
-        cardSmartwatchStatus?.setOnClickListener(clickGestionReloj)
-        btnPairDevice?.setOnClickListener(clickGestionReloj)
-        actualizarEstadoVisualReloj()
-
         btnStartAuto?.setOnClickListener {
+            if (isCaregiver) {
+                if (!isAutoMonitoring) {
+                    isAutoMonitoring = true
+                    handler.post(caregiverTelemetryRunnable)
+                    Toast.makeText(this, "Monitoreo remoto en vivo activado", Toast.LENGTH_SHORT).show()
+                }
+                return@setOnClickListener
+            }
+
             if (!isDeviceConnected) {
                 mostrarAlertaRelojNoVinculado()
                 return@setOnClickListener
@@ -194,9 +257,13 @@ class MainActivity : AppCompatActivity() {
         btnStopAuto?.setOnClickListener {
             if (isAutoMonitoring) {
                 isAutoMonitoring = false
-                handler.removeCallbacks(autoTelemetryRunnable)
-                tvStatus?.text = "Monitoreo automático detenido"
-                Toast.makeText(this, "Monitoreo automático detenido", Toast.LENGTH_SHORT).show()
+                if (isCaregiver) {
+                    handler.removeCallbacks(caregiverTelemetryRunnable)
+                } else {
+                    handler.removeCallbacks(autoTelemetryRunnable)
+                }
+                tvStatus?.text = "Monitoreo detenido"
+                Toast.makeText(this, "Monitoreo detenido", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -376,6 +443,52 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<AlertsHistoryResponse>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Error de red: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun consultarTelemetriaRemota() {
+        if (userId.isEmpty()) return
+
+        val tvHeartRateDisplay = findViewById<TextView?>(R.id.tvHeartRateDisplay)
+        val tvZoneTag = findViewById<TextView?>(R.id.tvZoneTag)
+        val tvStatus = findViewById<TextView?>(R.id.tvStatus)
+        val cardEmergencyAlert = findViewById<MaterialCardView?>(R.id.cardEmergencyAlert)
+        val tvEmergencyTitle = findViewById<TextView?>(R.id.tvEmergencyTitle)
+        val tvEmergencyDetail = findViewById<TextView?>(R.id.tvEmergencyDetail)
+        val tvFamilyPhoneDisplay = findViewById<TextView?>(R.id.tvFamilyPhoneDisplay)
+        val btnCallFamily = findViewById<Button?>(R.id.btnCallFamily)
+
+        RetrofitClient.instance.getLatestTelemetry(userId).enqueue(object : Callback<LatestTelemetryResponse> {
+            override fun onResponse(call: Call<LatestTelemetryResponse>, response: Response<LatestTelemetryResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val data = response.body()!!
+                    val bpm = data.heart_rate
+
+                    tvHeartRateDisplay?.text = bpm.toString()
+                    actualizarColorVisual(bpm, tvHeartRateDisplay, tvZoneTag)
+
+                    if (data.is_alert) {
+                        cardEmergencyAlert?.visibility = View.VISIBLE
+                        tvEmergencyTitle?.text = "🚨 ALERTA SOS EN VIVO DEL PACIENTE"
+                        val alertReason = data.latest_alert?.reason ?: "Frecuencia crítica fuera de rango"
+                        val alertUbicacion = data.location?.direccion_aproximada ?: "Lota, Región del Biobío, Chile"
+                        val alertHora = data.timestamp ?: "Reciente"
+                        tvEmergencyDetail?.text = "¡Atención! Se detectó alteración cardíaca en $userName ($bpm BPM).\n\n• Motivo: $alertReason\n• Ubicación: $alertUbicacion\n• Registro: $alertHora"
+                        btnCallFamily?.text = "📞 LLAMAR DE INMEDIATO AL PACIENTE"
+                        val tel = if (!data.emergency_phone.isNullOrEmpty()) data.emergency_phone else emergencyPhone
+                        tvFamilyPhoneDisplay?.text = "Teléfono de contacto: $tel"
+                        tvStatus?.text = "🚨 Alerta activa recibida desde el servidor"
+                    } else {
+                        cardEmergencyAlert?.visibility = View.GONE
+                        val timeStr = if (data.timestamp != null && data.timestamp.length >= 8) data.timestamp.takeLast(8) else ""
+                        tvStatus?.text = "✅ Paciente Estable · $bpm BPM (Actualizado $timeStr)"
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<LatestTelemetryResponse>, t: Throwable) {
+                tvStatus?.text = "Aviso: Sin conexión con la nube (${t.message})"
             }
         })
     }
@@ -694,5 +807,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         isAutoMonitoring = false
         handler.removeCallbacks(autoTelemetryRunnable)
+        handler.removeCallbacks(caregiverTelemetryRunnable)
     }
 }
