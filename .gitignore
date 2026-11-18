@@ -1,0 +1,39 @@
+# Gradle & Android Build Outputs
+.gradle/
+**/.gradle/
+build/
+**/build/
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+local.properties
+.cxx/
+captures/
+
+# IDEs & Editors
+.idea/
+**/.idea/
+*.iml
+.vscode/
+**/.vscode/
+
+# Python Cache & Environments
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+.venv/
+env/
+
+# Node.js
+node_modules/
+dist/
+
+# OS Generated
+.DS_Store
+Thumbs.db
+desktop.ini

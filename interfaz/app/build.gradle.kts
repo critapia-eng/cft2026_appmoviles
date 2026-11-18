@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "cl.cft2026.pulseup"
+    namespace = "com.example.myapplication"
     compileSdk {
         version = release(37)
     }

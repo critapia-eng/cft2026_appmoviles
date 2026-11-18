@@ -3,143 +3,236 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    android:fillViewport="true"
-    android:padding="24dp">
+    android:background="#FFFFFF"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="28dp">
 
-        <!-- LOGO Y TÍTULO OFICIAL PULSEUP -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="❤️ PulseUP"
+            android:text="@string/login_brand"
             android:textColor="#1565C0"
-            android:textSize="34sp"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="28dp"
-            android:text="Monitoreo Cardíaco - Adulto Mayor"
-            android:textColor="#666666"
-            android:textSize="14sp" />
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/login_subtitle"
+            android:textColor="#424242"
+            android:textSize="13sp" />
 
-        <!-- CAMPOS DE REGISTRO DEL PACIENTE -->
+        <!-- Campo Nombre -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:text="Nombre del Paciente"
-            android:textColor="#333333"
+            android:text="@string/label_patient_name"
+            android:textColor="#1A1A1A"
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etName"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="14dp"
-            android:background="@android:drawable/editbox_background_normal"
-            android:hint="Ej: Juan Pérez"
-            android:inputType="textPersonName"
-            android:paddingHorizontal="12dp"
-            android:textSize="15sp" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/hint_patient_name"
+            app:boxBackgroundColor="#F5F5F5"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="#1565C0"
+            app:hintTextColor="#1565C0">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName|textCapWords"
+                android:textColor="#111111"
+                android:textColorHint="#757575"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo RUT -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:text="RUT del Paciente"
-            android:textColor="#333333"
+            android:text="@string/label_patient_rut"
+            android:textColor="#1A1A1A"
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etRut"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="14dp"
-            android:background="@android:drawable/editbox_background_normal"
-            android:hint="Ej: 12.345.678-9"
-            android:inputType="text"
-            android:paddingHorizontal="12dp"
-            android:textSize="15sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="Teléfono de Emergencia (Familiar/Cuidador)"
-            android:textColor="#333333"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/hint_patient_rut"
+            app:boxBackgroundColor="#F5F5F5"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="#1565C0"
+            app:hintTextColor="#1565C0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRut"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textColor="#111111"
+                android:textColorHint="#757575"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo Teléfono de Emergencia / Familiar -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="@string/label_emergency_phone"
+            android:textColor="#1A1A1A"
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etPhone"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="18dp"
-            android:background="@android:drawable/editbox_background_normal"
-            android:hint="Ej: +56912345678"
-            android:inputType="phone"
-            android:paddingHorizontal="12dp"
-            android:textSize="15sp" />
-
-        <!-- PREGUNTA DE CONDICIÓN RÍTMICA -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seleccione su Condición Rítmica:"
+            android:layout_marginBottom="6dp"
+            android:text="Contacto al cual se llamará automáticamente ante una emergencia médica"
+            android:textColor="#616161"
+            android:textSize="11sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/hint_emergency_phone"
+            app:boxBackgroundColor="#F5F5F5"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="#1565C0"
+            app:hintTextColor="#1565C0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:textColor="#111111"
+                android:textColorHint="#757575"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Selector de Condición Rítmica -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_condition"
             android:textColor="#1565C0"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="8dp"
-            android:text="Indique su ritmo cardíaco base diagnosticado por su médico:"
-            android:textColor="#777777"
-            android:textSize="12sp" />
+            android:text="@string/label_condition_hint"
+            android:textColor="#616161"
+            android:textSize="11sp" />
 
         <Spinner
             android:id="@+id/spinnerCondition"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="26dp"
+            android:layout_height="52dp"
+            android:layout_marginBottom="16dp"
             android:background="@android:drawable/btn_dropdown"
-            android:paddingStart="8dp" />
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
 
-        <!-- BOTÓN DE INGRESO -->
-        <Button
-            android:id="@+id/btnRegister"
+        <!-- Campo Antecedentes Médicos / Ficha Médica -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:backgroundTint="#1565C0"
-            android:text="Ingresar y Comenzar Monitoreo"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="Antecedentes Médicos / Ficha Clínica"
+            android:textColor="#1A1A1A"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
-        <!-- MENSAJE DE ESTADO O ERROR -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Enfermedades crónicas, alergias, tipo de sangre o medicamentos"
+            android:textColor="#616161"
+            android:textSize="11sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:hint="Ej: Hipertensión, Alérgico a penicilina, O+"
+            app:boxBackgroundColor="#F5F5F5"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="#1565C0"
+            app:hintTextColor="#1565C0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMedicalHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="2"
+                android:textColor="#111111"
+                android:textColorHint="#757575"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="#1565C0"
+            android:text="@string/btn_start_monitoring"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp" />
+
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="14dp"
             android:gravity="center"
             android:textColor="#D32F2F"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
 
     </LinearLayout>
 </ScrollView>

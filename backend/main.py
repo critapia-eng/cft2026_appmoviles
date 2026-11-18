@@ -1,84 +1,47 @@
-import uuid
-import hashlib
-from datetime import datetime
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+import sys
+from pathlib import Path
 
-app = FastAPI(title="API de Alertas de Salud - Telemetría")
+# Configurar path para permitir imports tanto directos (python main.py) como modulares
+current_dir = Path(__file__).resolve().parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
 
-# Bases de datos temporales en memoria
-users_db = {}
-telemetry_db = []
-alerts_db = []
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Modelos de datos
-class UserRegister(BaseModel):
-    name: str
-    rut: str
-    emergency_phone: str
+# Re-exportar datos y modelos para mantener 100% de retrocompatibilidad
+from database import users_db, telemetry_db, alerts_db
+from models import UserRegister, UserResponse, VitalSigns
+from utils import hash_rut
 
-class UserResponse(BaseModel):
-    user_id: uuid.UUID
-    name: str
-    rut_hashed: str
-    emergency_phone: str
+# Importación de routers modulares
+from routers import users_router, telemetry_router, alerts_router
 
-class VitalSigns(BaseModel):
-    user_id: uuid.UUID
-    heart_rate: int = Field(..., ge=30, le=220)
-    systolic_pressure: int
-    diastolic_pressure: int
+# Inicialización de la aplicación FastAPI
+app = FastAPI(
+    title="API de Alertas de Salud - Telemetría",
+    description="Backend modular y escalable para registro de pacientes, telemetría y alertas SOS.",
+    version="2.0.0"
+)
 
-def hash_rut(rut: str) -> str:
-    clean_rut = rut.replace(".", "").replace("-", "").strip().lower()
-    return hashlib.sha256(clean_rut.encode()).hexdigest()
+# Configuración de CORS para permitir conexiones desde la app móvil y frontend web
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Inclusión de routers modulares
+app.include_router(users_router)
+app.include_router(telemetry_router)
+app.include_router(alerts_router)
 
 @app.get("/")
 def home():
     return {"status": "ok", "message": "Servidor backend activo"}
 
-@app.post("/users/register", response_model=UserResponse)
-def register_user(user: UserRegister):
-    user_id = uuid.uuid4()
-    rut_protected = hash_rut(user.rut)
-    
-    user_data = {
-        "user_id": user_id,
-        "name": user.name,
-        "rut_hashed": rut_protected,
-        "emergency_phone": user.emergency_phone
-    }
-    users_db[user_id] = user_data
-    return user_data
-
-@app.post("/telemetry/send")
-def receive_telemetry(data: VitalSigns):
-    if data.user_id not in users_db:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    timestamp = datetime.now()
-    record = {**data.dict(), "timestamp": timestamp}
-    telemetry_db.append(record)
-
-    # Evaluación de rangos de peligro
-    is_high_pressure = data.systolic_pressure > 140
-    is_low_pressure = data.systolic_pressure < 90
-    is_anomalous_hr = data.heart_rate > 120 or data.heart_rate < 50
-
-    if is_high_pressure or is_low_pressure or is_anomalous_hr:
-        alert = {
-            "alert_id": uuid.uuid4(),
-            "user_id": data.user_id,
-            "timestamp": timestamp,
-            "reason": f"Sistólica: {data.systolic_pressure}, BPM: {data.heart_rate}",
-            "contact_phone": users_db[data.user_id]["emergency_phone"],
-            "status": "LLAMADA_A_HOSPITAL_INICIADA"
-        }
-        alerts_db.append(alert)
-        return {"alert_triggered": True, "message": "ANOMALÍA DETECTADA: Alerta enviada al hospital.", "alert_details": alert}
-
-    return {"alert_triggered": False, "message": "Signos vitales estables."}
-
-@app.get("/alerts")
-def get_alerts():
-    return {"alerts": alerts_db}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

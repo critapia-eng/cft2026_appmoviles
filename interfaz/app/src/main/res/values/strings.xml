@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">PulseUP</string>
+    <string name="login_brand">❤️ PulseUP</string>
+    <string name="login_subtitle">Monitoreo Cardíaco · Adulto Mayor</string>
+    <string name="label_patient_name">Nombre del Paciente</string>
+    <string name="hint_patient_name">Ej: Juan Pérez</string>
+    <string name="label_patient_rut">RUT del Paciente</string>
+    <string name="hint_patient_rut">Ej: 12.345.678-9</string>
+    <string name="label_emergency_phone">Teléfono de Emergencia / Teléfono Familiar</string>
+    <string name="hint_emergency_phone">Ej: +56912345678</string>
+    <string name="label_condition">Seleccione su Condición Rítmica:</string>
+    <string name="label_condition_hint">Indique su ritmo cardíaco base diagnosticado por su médico:</string>
+    <string name="btn_start_monitoring">Ingresar y Comenzar Monitoreo</string>
 </resources>
