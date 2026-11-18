@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    container_name: fastapi_app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=172.18.0.3
+      - DB_USER=cft2026_appmoviles
+      - DB_PASSWORD=dEEdkx57C2RFMtp7
+      - DB_NAME=cft2026_appmoviles
+      - DB_PORT=3306
+    volumes:
+      - .:/app

@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Corazón médico rojo vibrante -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M54,76.5 C52.5,75.1 27,51.8 27,37.5 C27,27.8 34.8,20 44.5,20 C50,20 54,23.5 54,23.5 C54,23.5 58,20 63.5,20 C73.2,20 81,27.8 81,37.5 C81,51.8 55.5,75.1 54,76.5 Z" />
+
+    <!-- Línea de Electrocardiograma (Pulso ECG blanco nítido) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M32,41 L43,41 L48,31 L53,52 L58,36 L62,43 L76,43" />
+</vector>

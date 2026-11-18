@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.MyApplication" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/pulse_blue</item>
+        <item name="colorPrimaryContainer">@color/pulse_blue</item>
+        <item name="android:statusBarColor">@color/pulse_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <!-- Forzar color de texto principal oscuro siempre -->
+        <item name="android:textColor">#212121</item>
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="android:textColorSecondary">#616161</item>
+        <item name="android:textColorHint">#757575</item>
+    </style>
+
+    <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
+</resources>
