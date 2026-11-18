@@ -1,10 +1,54 @@
 import uuid
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models import UserRegister, UserResponse
 from database import get_db_connection, users_db
 from utils import hash_rut
 
 router = APIRouter(prefix="/users", tags=["Usuarios"])
+
+@router.get("/by-rut/{rut}", response_model=UserResponse)
+def get_user_by_rut(rut: str):
+    """
+    Verifica si un paciente ya está registrado mediante su RUT.
+    Permite el acceso a familiares o médicos únicamente si el paciente existe previamente.
+    """
+    rut_protected = hash_rut(rut)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT user_id, nombre, rut_hashed, telefono_emergencia, condition_type 
+            FROM usuarios 
+            WHERE rut_hashed = %s 
+            LIMIT 1
+            """,
+            (rut_protected,)
+        )
+        existing_user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if existing_user:
+            return {
+                "user_id": str(existing_user["user_id"]),
+                "name": existing_user.get("nombre", "Paciente"),
+                "rut_hashed": rut_protected,
+                "emergency_phone": existing_user.get("telefono_emergencia", ""),
+                "condition_type": existing_user.get("condition_type", "Ritmo Normal")
+            }
+    except Exception as e:
+        print(f"[MySQL by-rut error] {e}")
+
+    # Fallback en memoria si MySQL estuviera offline
+    for uid, udata in users_db.items():
+        if udata.get("rut_hashed") == rut_protected:
+            return udata
+
+    raise HTTPException(
+        status_code=404,
+        detail="El paciente no se encuentra registrado en el sistema. El paciente debe registrarse primero antes de que un familiar pueda monitorearlo."
+    )
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserRegister):
