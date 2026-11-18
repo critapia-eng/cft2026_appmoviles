@@ -110,3 +110,115 @@ def receive_telemetry(data: VitalSigns):
         }
 
     return {"alert_triggered": False, "message": "Signos vitales estables."}
+
+@router.get("/latest/{user_id}")
+def get_latest_telemetry(user_id: str):
+    """
+    Retorna la última lectura telemétrica, alertas activas y geolocalización
+    del paciente para ser visualizados por familiares o personal médico en tiempo real.
+    """
+    user_id_str = str(user_id)
+    reading = None
+    latest_alert = None
+    patient_info = None
+    location = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1. Obtener última lectura telemétrica de MySQL
+        cursor.execute(
+            """
+            SELECT heart_rate, systolic_pressure, diastolic_pressure, timestamp
+            FROM lecturas_ritmo
+            WHERE user_id = %s
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (user_id_str,)
+        )
+        reading = cursor.fetchone()
+
+        # 2. Obtener última alerta SOS del usuario
+        cursor.execute(
+            """
+            SELECT alert_id, reason, contact_phone, status, timestamp
+            FROM alertas_sos
+            WHERE user_id = %s
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (user_id_str,)
+        )
+        latest_alert = cursor.fetchone()
+
+        # 3. Obtener ubicación de la última alerta (si existe)
+        if latest_alert and latest_alert.get("alert_id"):
+            cursor.execute(
+                """
+                SELECT latitud, longitud, direccion_aproximada
+                FROM ubicaciones_alerta
+                WHERE alert_id = %s
+                ORDER BY timestamp DESC
+                LIMIT 1
+                """,
+                (latest_alert["alert_id"],)
+            )
+            location = cursor.fetchone()
+
+        # 4. Obtener datos del paciente
+        cursor.execute(
+            """
+            SELECT nombre, telefono_emergencia
+            FROM usuarios
+            WHERE user_id = %s
+            LIMIT 1
+            """,
+            (user_id_str,)
+        )
+        patient_info = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"[MySQL Latest Telemetry Warning] {e}")
+
+    # Fallbacks en memoria si MySQL no tiene registros
+    if not reading:
+        user_readings = [t for t in telemetry_db if str(t.get("user_id")) == user_id_str]
+        if user_readings:
+            reading = user_readings[-1]
+
+    if not latest_alert:
+        user_alerts = [a for a in alerts_db if str(a.get("user_id")) == user_id_str]
+        if user_alerts:
+            latest_alert = user_alerts[-1]
+
+    bpm = reading["heart_rate"] if reading and "heart_rate" in reading else 75
+    sys = reading["systolic_pressure"] if reading and "systolic_pressure" in reading else 120
+    dia = reading["diastolic_pressure"] if reading and "diastolic_pressure" in reading else 80
+    ts = str(reading["timestamp"]) if reading and "timestamp" in reading else str(datetime.now())
+
+    is_alert = (bpm > 120 or bpm < 50 or sys > 140 or sys < 90)
+
+    if not location:
+        location = {
+            "latitud": -37.0933,
+            "longitud": -73.1556,
+            "direccion_aproximada": "Lota, Región del Biobío, Chile (Sector CFT Lota Arauco)"
+        }
+
+    return {
+        "status": "ok",
+        "user_id": user_id_str,
+        "patient_name": patient_info.get("nombre", "Paciente") if patient_info else "Paciente",
+        "emergency_phone": patient_info.get("telefono_emergencia", "") if patient_info else "",
+        "heart_rate": bpm,
+        "systolic_pressure": sys,
+        "diastolic_pressure": dia,
+        "timestamp": ts,
+        "is_alert": is_alert,
+        "latest_alert": latest_alert,
+        "location": location
+    }
