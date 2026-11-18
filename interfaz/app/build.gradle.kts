@@ -11,18 +11,30 @@ android {
     defaultConfig {
         applicationId = "cl.cft2026.pulseup"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("pulseup-release.jks")
+            storePassword = "CFT2026PulseUpReleaseSecKey"
+            keyAlias = "pulseup"
+            keyPassword = "CFT2026PulseUpReleaseSecKey"
+        }
+    }
+
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {

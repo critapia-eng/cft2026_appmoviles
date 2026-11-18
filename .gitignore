@@ -12,6 +12,13 @@ local.properties
 .cxx/
 captures/
 
+# Keystores & Release Keys
+*.jks
+*.keystore
+**/*.jks
+**/*.keystore
+keystore.properties
+
 # IDEs & Editors
 .idea/
 **/.idea/
