@@ -41,10 +41,10 @@ class MainActivity : AppCompatActivity() {
     private var isCaregiver: Boolean = false
 
     // Estado del reloj inteligente vinculado (Bluetooth LE / PPG)
-    private var isDeviceConnected = true
-    private var connectedDeviceName = "Smartwatch Y13 (BLE)"
-    private var connectedDeviceMac = "78:4F:43:89:A1:20"
-    private var connectedBattery = 94
+    private var isDeviceConnected = false
+    private var connectedDeviceName = "Sin Smartwatch Vinculado"
+    private var connectedDeviceMac = "Sin conexión"
+    private var connectedBattery = 0
 
     private val handler = Handler(Looper.getMainLooper())
     private var isAutoMonitoring = false
